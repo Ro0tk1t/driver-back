@@ -1,0 +1,26 @@
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9009
+    timeout: 1s
+data:
+  env:
+    #storeType: minio
+    storeType: local
+  database:
+    # actualy we use mariadb
+    driver: mysql
+    source: root:mysql@tcp(127.0.0.1:3306)/zdriver?parseTime=True&loc=Local
+  redis:
+    addr: 127.0.0.1:6379
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+  minio:
+    endpoint: 127.0.0.1:9000
+    # keyID: abcdefg
+    # key_pass: v03Oq4ouGfxfXF8RbsyzJKS5Mz3uRAPK6DCAQkVM
+    # keyPass: "123456789"
+    keyID: 9yoGv8zfX3dOTFRfniyd
+    keyPass: "TZJ0R9ydFtCFKItBcrs3SJE11Ez39E57rPsObjei"

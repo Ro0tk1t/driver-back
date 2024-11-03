@@ -1,0 +1,135 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "driver-back/api/user/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.user.v1";
+option java_outer_classname = "UserProtoV1";
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      get: "/helloworld/{name}"
+    };
+  }
+}
+
+service UserSvc {
+  rpc Register (RegisterRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/register"
+      body: "*"
+    };
+  }
+  rpc Login (LoginRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/login"
+      body: "*"
+    };
+  }
+  // rpc GetUser (GetUserRequest) returns (GetUserReply) {
+  //   option (google.api.http) = {
+  //     get: "/user/{id}"
+  //   };
+  // }
+  rpc Upload (UploadRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/upload"
+      body: "*"
+    };
+  }
+  rpc UploadOver(UploadRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/uploadOver"
+      body: "*"
+    };
+  }
+  //rpc Download(DownloadRequest) returns (stream DownloadReply) {
+  rpc Download(DownloadRequest) returns (stream DownloadReply) {
+    option (google.api.http) = {
+      get: "/download/{filename}"
+    };
+  }
+  rpc ListFiles(ListFilesRequest) returns (ListFilesReply) {
+    option (google.api.http) = {
+      get: "/listFiles"
+    };
+  }
+  rpc DeleteFiles(DeleteFilesRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/deleteFiles"
+      body: "*"
+    };
+  }
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string email = 3;
+  string phone = 4;
+  string password = 2;
+}
+
+message CommonReply {
+  string message = 1;
+  uint32 code = 2;
+  string reason = 3;
+}
+
+message LoginRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message UploadRequest{
+  string filename = 1;
+  string chunk = 2;
+  uint32 chunkIndex = 3;
+}
+
+message DownloadRequest{
+  string path = 1;
+  string filename = 2;
+}
+
+message DownloadReply{
+  bytes content = 1;
+}
+
+message ListFilesRequest{
+  string path = 1;
+  uint32 page = 2;
+  uint32 pageSize = 3;
+}
+
+message ListFilesReply{
+  repeated FileInfo fileInfos = 1;
+  uint64 total = 2;
+}
+
+message FileInfo{
+  string name = 1;
+  uint64 size = 2;
+  uint64 time = 3;
+  string type = 4;
+}
+
+message DeleteFilesRequest{
+  string path = 1;
+  repeated string files = 2;
+}

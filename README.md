@@ -1,4 +1,6 @@
-# Kratos Project Template
+# Kratos Project
+
+### Kratos + MariaDB + Minio 
 
 ## Install Kratos
 ```

@@ -209,3 +209,18 @@ func (u *UserService) DeleteFiles(ctx context.Context, req *v1.DeleteFilesReques
 	u.uu.DeleteFiles(ctx, user.ID, req.Path, req.Files)
 	return nil, nil
 }
+
+func (u *UserService) CreateDir(ctx context.Context, req *v1.CreateDirRequest) (*v1.CommonReply, error) {
+	// same as upload file, but filetype is directory
+	user := getUserFromCtx(ctx)
+	u.uu.CreateFile(ctx, req.Dirname, &public.File{
+		Hash: "",
+		Type: "directory",
+		UID:  user.ID,
+		Name: "",
+		Path: req.Dirname,
+		Size: 0,
+		Time: time.Now().Unix(),
+	})
+	return &v1.CommonReply{Code: 200, Message: "seccess"}, nil
+}

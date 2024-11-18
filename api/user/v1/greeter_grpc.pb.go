@@ -118,6 +118,7 @@ const (
 	UserSvc_Download_FullMethodName    = "/user.v1.UserSvc/Download"
 	UserSvc_ListFiles_FullMethodName   = "/user.v1.UserSvc/ListFiles"
 	UserSvc_DeleteFiles_FullMethodName = "/user.v1.UserSvc/DeleteFiles"
+	UserSvc_CreateDir_FullMethodName   = "/user.v1.UserSvc/CreateDir"
 )
 
 // UserSvcClient is the client API for UserSvc service.
@@ -133,9 +134,11 @@ type UserSvcClient interface {
 	//	}
 	Upload(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	UploadOver(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	// rpc Download(DownloadRequest) returns (stream DownloadReply) {
 	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (*DownloadReply, error)
 	ListFiles(ctx context.Context, in *ListFilesRequest, opts ...grpc.CallOption) (*ListFilesReply, error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CommonReply, error)
 }
 
 type userSvcClient struct {
@@ -209,6 +212,15 @@ func (c *userSvcClient) DeleteFiles(ctx context.Context, in *DeleteFilesRequest,
 	return out, nil
 }
 
+func (c *userSvcClient) CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, UserSvc_CreateDir_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserSvcServer is the server API for UserSvc service.
 // All implementations must embed UnimplementedUserSvcServer
 // for forward compatibility
@@ -222,9 +234,11 @@ type UserSvcServer interface {
 	//	}
 	Upload(context.Context, *UploadRequest) (*CommonReply, error)
 	UploadOver(context.Context, *UploadRequest) (*CommonReply, error)
+	// rpc Download(DownloadRequest) returns (stream DownloadReply) {
 	Download(context.Context, *DownloadRequest) (*DownloadReply, error)
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*CommonReply, error)
+	CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error)
 	mustEmbedUnimplementedUserSvcServer()
 }
 
@@ -252,6 +266,9 @@ func (UnimplementedUserSvcServer) ListFiles(context.Context, *ListFilesRequest) 
 }
 func (UnimplementedUserSvcServer) DeleteFiles(context.Context, *DeleteFilesRequest) (*CommonReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFiles not implemented")
+}
+func (UnimplementedUserSvcServer) CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDir not implemented")
 }
 func (UnimplementedUserSvcServer) mustEmbedUnimplementedUserSvcServer() {}
 
@@ -392,6 +409,24 @@ func _UserSvc_DeleteFiles_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserSvc_CreateDir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDirRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSvcServer).CreateDir(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSvc_CreateDir_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSvcServer).CreateDir(ctx, req.(*CreateDirRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserSvc_ServiceDesc is the grpc.ServiceDesc for UserSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -426,6 +461,10 @@ var UserSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteFiles",
 			Handler:    _UserSvc_DeleteFiles_Handler,
+		},
+		{
+			MethodName: "CreateDir",
+			Handler:    _UserSvc_CreateDir_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

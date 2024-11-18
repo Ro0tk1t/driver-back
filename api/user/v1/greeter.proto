@@ -50,7 +50,7 @@ service UserSvc {
     };
   }
   //rpc Download(DownloadRequest) returns (stream DownloadReply) {
-  rpc Download(DownloadRequest) returns (stream DownloadReply) {
+  rpc Download(DownloadRequest) returns (DownloadReply) {
     option (google.api.http) = {
       get: "/download/{filename}"
     };
@@ -63,6 +63,12 @@ service UserSvc {
   rpc DeleteFiles(DeleteFilesRequest) returns (CommonReply){
     option (google.api.http) = {
       post: "/deleteFiles"
+      body: "*"
+    };
+  }
+  rpc CreateDir(CreateDirRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/createDir"
       body: "*"
     };
   }
@@ -132,4 +138,8 @@ message FileInfo{
 message DeleteFilesRequest{
   string path = 1;
   repeated string files = 2;
+}
+
+message CreateDirRequest{
+  string dirname = 1;
 }

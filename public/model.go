@@ -4,7 +4,7 @@ type User struct {
 	ID       int64  `json:"id" xorm:"'id' pk autoincr"`
 	Name     string `json:"name" xorm:"'name' varchar(100)`
 	Email    string `json:"email" xorm:"'email' varchar(80) unique" validate:"required,email"`
-	Phone    string `json:"phone" xorm:"varchar(20)`
+	Phone    string `json:"phone" xorm:'phone' "varchar(20)`
 	Password string `json:"password" validate:"required"`
 	Role     int64  `json:"role" xorm:"'role' int"`
 	Created  int64  `json:"created" xorm:"'created' int"`

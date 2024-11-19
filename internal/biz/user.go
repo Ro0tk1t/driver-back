@@ -51,13 +51,17 @@ func (u *UserUseCase) GetUser(ctx context.Context, user *public.User) (*public.U
 }
 
 func (u *UserUseCase) CreateFile(ctx context.Context, path string, file *public.File) (*public.File, error) {
-	switch public.StoreType {
-	case "minio":
-		u.repo.CreateFileMinIO(ctx, path, file)
-	case "local":
-		u.repo.CreateFileLocal(ctx, path, file)
-	default:
-		return nil, fmt.Errorf("unknown store type")
+	if file.Type == public.Directory.String() {
+		log.Infof("create directory %s for user %d", file.Path, file.UID)
+	} else {
+		switch public.StoreType {
+		case "minio":
+			u.repo.CreateFileMinIO(ctx, path, file)
+		case "local":
+			u.repo.CreateFileLocal(ctx, path, file)
+		default:
+			return nil, fmt.Errorf("unknown store type")
+		}
 	}
 	return u.repo.CreateFile(ctx, file)
 }

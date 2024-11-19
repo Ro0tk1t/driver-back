@@ -215,7 +215,7 @@ func (u *UserService) CreateDir(ctx context.Context, req *v1.CreateDirRequest) (
 	user := getUserFromCtx(ctx)
 	u.uu.CreateFile(ctx, req.Dirname, &public.File{
 		Hash: "",
-		Type: "directory",
+		Type: public.Directory.String(),
 		UID:  user.ID,
 		Name: "",
 		Path: req.Dirname,

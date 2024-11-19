@@ -11,3 +11,22 @@ func init() {
 		os.Mkdir(TmpDir, os.ModePerm)
 	}
 }
+
+type FileType int
+
+const (
+	Directory FileType = iota
+	Image
+	Audio
+	Text
+)
+
+var ftypeStr = []string{"directory", "image", "audio", "text"}
+
+func (f FileType) String() string {
+	return ftypeStr[f]
+}
+
+func (f FileType) Index() int {
+	return int(f)
+}

@@ -206,6 +206,8 @@ components:
             properties:
                 dirname:
                     type: string
+                current:
+                    type: string
         user.v1.DeleteFilesRequest:
             type: object
             properties:

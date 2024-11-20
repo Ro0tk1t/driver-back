@@ -112,15 +112,14 @@ func (u *userRepo) FindUserByEmail(ctx context.Context, email string) (*public.U
 }
 
 func (u *userRepo) CreateFile(ctx context.Context, file *public.File) (*public.File, error) {
-	if file.Type != public.Directory.String() {
-		has, err := u.engine.Where("hash = ?", file.Hash).And("uid = ?", file.UID).And("path=?", file.Path).Get(&public.File{})
-		if err != nil {
-			return nil, err
-		}
-		if has {
-			u.log.Error("file already exists ", "hash ", file.Hash)
-			return file, nil
-		}
+	has, err := u.engine.Where("name=?", file.Name).And("uid = ?", file.UID).And("path=?", file.Path).Get(&public.File{})
+	if err != nil {
+		return nil, err
+	}
+	// FIXME: cover exist file/dir ?
+	if has {
+		u.log.Error("file already exists ", "hash ", file.Hash)
+		return file, nil
 	}
 	if _, err := u.engine.Insert(file); err != nil {
 		return nil, err

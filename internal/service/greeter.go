@@ -213,11 +213,12 @@ func (u *UserService) DeleteFiles(ctx context.Context, req *v1.DeleteFilesReques
 func (u *UserService) CreateDir(ctx context.Context, req *v1.CreateDirRequest) (*v1.CommonReply, error) {
 	// same as upload file, but filetype is directory
 	user := getUserFromCtx(ctx)
+	// TODO: validate directory name
 	u.uu.CreateFile(ctx, req.Dirname, &public.File{
 		Hash: "",
 		Type: public.Directory.String(),
 		UID:  user.ID,
-		Name: "",
+		Name: req.Current,
 		Path: req.Dirname,
 		Size: 0,
 		Time: time.Now().Unix(),

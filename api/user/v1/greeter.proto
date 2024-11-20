@@ -142,4 +142,5 @@ message DeleteFilesRequest{
 
 message CreateDirRequest{
   string dirname = 1;
+  string current = 2;
 }

@@ -221,10 +221,32 @@ func (u *userRepo) ListFiles(ctx context.Context, uid int64, path string, page, 
 	return total, files, nil
 }
 
-func (u *userRepo) DeleteFiles(ctx context.Context, uid int64, path string, files []string) {
-	fmt.Println(uid, path, files)
+func (u *userRepo) DeleteFiles(ctx context.Context, uid int64, path_ string, files []string) {
+	fmt.Println(uid, path_, files)
 	for _, f := range files {
-		if _, err := u.engine.Where("uid=?", uid).And("path=?", path).And("name=?", f).Delete(&public.File{}); err != nil {
+		fs := public.File{UID: uid, Path: path_, Name: f}
+		has, err := u.engine.Get(&fs)
+		if !has {
+			u.log.Errorf("path: %s, name: %s  not found!", path_, f)
+			u.log.Errorf("%#v", err)
+			return
+		}
+		if err != nil {
+			u.log.Error("db error, ", err)
+			return
+		}
+		if fs.Type == public.Directory.String() {
+			// TODO: use TRANSACTION
+			p := path.Join(path_, f) + "/"
+			var fss []public.File
+			if err := u.engine.Table(&fs).Where("uid=?", uid).And("path=?", p).Cols("name").Find(&fss); err != nil {
+				u.log.Error("search file error, ", err)
+			}
+			for _, fs_ := range fss {
+				u.DeleteFiles(ctx, uid, p, []string{fs_.Name})
+			}
+		}
+		if _, err := u.engine.Where("uid=?", uid).And("path=?", path_).And("name=?", f).Delete(&public.File{}); err != nil {
 			u.log.Error(err)
 		}
 	}

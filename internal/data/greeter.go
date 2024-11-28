@@ -65,6 +65,9 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 	if err := engine.Sync(new(public.File)); err != nil {
 		fmt.Print(err)
 	}
+	if err := engine.Sync(new(public.ShareInfo)); err != nil {
+		fmt.Print(err)
+	}
 
 	client, err := minio.New(data.MinioAccess.Endpoint, &minio.Options{
 		Creds: credentials.NewStaticV2(data.MinioAccess.KeyID, data.MinioAccess.KeyPass, ""),
@@ -79,6 +82,7 @@ func NewUserRepo(data *Data, logger log.Logger) biz.UserRepo {
 		log:    log.NewHelper(logger),
 	}
 }
+
 func (u *userRepo) CreateUser(ctx context.Context, user *public.User) (*public.User, error) {
 	_, err := u.engine.Insert(user)
 	u.log.Debugf("err:::::::::: %#v", err)

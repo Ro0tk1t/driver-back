@@ -2,7 +2,7 @@ module driver-back
 
 go 1.22
 
-toolchain go1.23.0
+toolchain go1.23.3
 
 require (
 	github.com/go-kratos/kratos/v2 v2.8.0

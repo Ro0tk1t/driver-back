@@ -225,3 +225,15 @@ func (u *UserService) CreateDir(ctx context.Context, req *v1.CreateDirRequest) (
 	})
 	return &v1.CommonReply{Code: 200, Message: "seccess"}, nil
 }
+
+func (u *UserService) CreateShare(ctx context.Context, req *v1.CreateShareRequest) (*v1.CommonReply, error) {
+	return nil, nil
+}
+
+func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v1.CommonReply, error) {
+	return nil, nil
+}
+
+func (u *UserService) SaveShare(ctx context.Context, req *v1.SaveShareRequest) (*v1.CommonReply, error) {
+	return nil, nil
+}

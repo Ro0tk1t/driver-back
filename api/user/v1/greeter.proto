@@ -72,6 +72,23 @@ service UserSvc {
       body: "*"
     };
   }
+  rpc CreateShare(CreateShareRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/createShare"
+      body: "*"
+    };
+  }
+  rpc GetShare(GetShareRequest) returns (CommonReply){
+    option (google.api.http) = {
+      get: "/getShare/{id}"
+    };
+  }
+  rpc SaveShare(SaveShareRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/saveShare"
+      body: "*"
+    };
+  }
 }
 
 // The request message containing the user's name.
@@ -143,4 +160,23 @@ message DeleteFilesRequest{
 message CreateDirRequest{
   string dirname = 1;
   string current = 2;
+}
+
+message CreateShareRequest{
+  string path = 1;
+  string names = 2;
+  string expireTime = 3;
+  string password = 4;
+}
+
+message GetShareRequest{
+  string id = 1;
+  string password = 2;
+}
+
+message SaveShareRequest{
+  string sharePath = 1;
+  string names = 2;
+  string shareID = 3;
+  string savePath = 4;
 }

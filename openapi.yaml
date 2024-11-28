@@ -24,6 +24,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.v1.CommonReply'
+    /createShare:
+        post:
+            tags:
+                - UserSvc
+            operationId: UserSvc_CreateShare
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.v1.CreateShareRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.CommonReply'
     /deleteFiles:
         post:
             tags:
@@ -65,6 +83,28 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.v1.DownloadReply'
+    /getShare/{id}:
+        get:
+            tags:
+                - UserSvc
+            operationId: UserSvc_GetShare
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: password
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.CommonReply'
     /helloworld/{name}:
         get:
             tags:
@@ -147,6 +187,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.v1.CommonReply'
+    /saveShare:
+        post:
+            tags:
+                - UserSvc
+            operationId: UserSvc_SaveShare
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.v1.SaveShareRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.CommonReply'
     /upload:
         post:
             tags:
@@ -208,6 +266,17 @@ components:
                     type: string
                 current:
                     type: string
+        user.v1.CreateShareRequest:
+            type: object
+            properties:
+                path:
+                    type: string
+                names:
+                    type: string
+                expireTime:
+                    type: string
+                password:
+                    type: string
         user.v1.DeleteFilesRequest:
             type: object
             properties:
@@ -266,6 +335,17 @@ components:
                 phone:
                     type: string
                 password:
+                    type: string
+        user.v1.SaveShareRequest:
+            type: object
+            properties:
+                sharePath:
+                    type: string
+                names:
+                    type: string
+                shareID:
+                    type: string
+                savePath:
                     type: string
         user.v1.UploadRequest:
             type: object

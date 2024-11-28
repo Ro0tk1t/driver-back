@@ -1,10 +1,11 @@
 package public
 
 type User struct {
-	ID       int64  `json:"id" xorm:"'id' pk autoincr"`
-	Name     string `json:"name" xorm:"'name' varchar(100)`
-	Email    string `json:"email" xorm:"'email' varchar(80) unique" validate:"required,email"`
-	Phone    string `json:"phone" xorm:'phone' "varchar(20)`
+	ID    int64  `json:"id" xorm:"'id' pk autoincr"`
+	Name  string `json:"name" xorm:"'name' varchar(100)"`
+	Email string `json:"email" xorm:"'email' varchar(80) unique" validate:"required,email"`
+	Phone string `json:"phone" xorm:"'phone' varchar(20)"`
+	// TODO: encrypt password
 	Password string `json:"password" validate:"required"`
 	Role     int64  `json:"role" xorm:"'role' int"`
 	Created  int64  `json:"created" xorm:"'created' int"`
@@ -32,8 +33,8 @@ type File struct {
 }
 
 type ShareInfo struct {
-	Link     string `json:"link" xorm:"'link' varchar(255)`
-	UserName string `json:"username" xorm:"'username' varchar(255)`
+	Link     string `json:"link" xorm:"'link' varchar(255)"`
+	UserName string `json:"username" xorm:"'username' varchar(255)"`
 	Fids     string `json:"fid" xorm:"'fids' text"`
 	Uid      int64  `json:"uid" xorm:"'uid' int"`
 	Created  int64  `json:"created" xorm:"'created' int"`

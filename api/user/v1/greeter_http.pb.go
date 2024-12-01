@@ -85,8 +85,10 @@ const OperationUserSvcDownload = "/user.v1.UserSvc/Download"
 const OperationUserSvcGetShare = "/user.v1.UserSvc/GetShare"
 const OperationUserSvcListFiles = "/user.v1.UserSvc/ListFiles"
 const OperationUserSvcLogin = "/user.v1.UserSvc/Login"
+const OperationUserSvcMoveFiles = "/user.v1.UserSvc/MoveFiles"
 const OperationUserSvcRegister = "/user.v1.UserSvc/Register"
 const OperationUserSvcSaveShare = "/user.v1.UserSvc/SaveShare"
+const OperationUserSvcSearchResource = "/user.v1.UserSvc/SearchResource"
 const OperationUserSvcUpload = "/user.v1.UserSvc/Upload"
 const OperationUserSvcUploadOver = "/user.v1.UserSvc/UploadOver"
 
@@ -99,8 +101,10 @@ type UserSvcHTTPServer interface {
 	GetShare(context.Context, *GetShareRequest) (*CommonReply, error)
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error)
 	Login(context.Context, *LoginRequest) (*CommonReply, error)
+	MoveFiles(context.Context, *MoveFilesRequest) (*CommonReply, error)
 	Register(context.Context, *RegisterRequest) (*CommonReply, error)
 	SaveShare(context.Context, *SaveShareRequest) (*CommonReply, error)
+	SearchResource(context.Context, *SearchRequest) (*CommonReply, error)
 	// Upload rpc GetUser (GetUserRequest) returns (GetUserReply) {
 	//   option (google.api.http) = {
 	//     get: "/user/{id}"
@@ -120,6 +124,8 @@ func RegisterUserSvcHTTPServer(s *http.Server, srv UserSvcHTTPServer) {
 	r.GET("/listFiles", _UserSvc_ListFiles0_HTTP_Handler(srv))
 	r.POST("/deleteFiles", _UserSvc_DeleteFiles0_HTTP_Handler(srv))
 	r.POST("/createDir", _UserSvc_CreateDir0_HTTP_Handler(srv))
+	r.POST("/moveFiles", _UserSvc_MoveFiles0_HTTP_Handler(srv))
+	r.GET("/search", _UserSvc_SearchResource0_HTTP_Handler(srv))
 	r.POST("/createShare", _UserSvc_CreateShare0_HTTP_Handler(srv))
 	r.GET("/getShare/{id}", _UserSvc_GetShare0_HTTP_Handler(srv))
 	r.POST("/saveShare", _UserSvc_SaveShare0_HTTP_Handler(srv))
@@ -298,6 +304,47 @@ func _UserSvc_CreateDir0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Conte
 	}
 }
 
+func _UserSvc_MoveFiles0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in MoveFilesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserSvcMoveFiles)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.MoveFiles(ctx, req.(*MoveFilesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CommonReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _UserSvc_SearchResource0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SearchRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserSvcSearchResource)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SearchResource(ctx, req.(*SearchRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CommonReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _UserSvc_CreateShare0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CreateShareRequest
@@ -372,8 +419,10 @@ type UserSvcHTTPClient interface {
 	GetShare(ctx context.Context, req *GetShareRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	ListFiles(ctx context.Context, req *ListFilesRequest, opts ...http.CallOption) (rsp *ListFilesReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
+	MoveFiles(ctx context.Context, req *MoveFilesRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	Register(ctx context.Context, req *RegisterRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	SaveShare(ctx context.Context, req *SaveShareRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
+	SearchResource(ctx context.Context, req *SearchRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	Upload(ctx context.Context, req *UploadRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	UploadOver(ctx context.Context, req *UploadRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 }
@@ -477,6 +526,19 @@ func (c *UserSvcHTTPClientImpl) Login(ctx context.Context, in *LoginRequest, opt
 	return &out, nil
 }
 
+func (c *UserSvcHTTPClientImpl) MoveFiles(ctx context.Context, in *MoveFilesRequest, opts ...http.CallOption) (*CommonReply, error) {
+	var out CommonReply
+	pattern := "/moveFiles"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserSvcMoveFiles))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *UserSvcHTTPClientImpl) Register(ctx context.Context, in *RegisterRequest, opts ...http.CallOption) (*CommonReply, error) {
 	var out CommonReply
 	pattern := "/register"
@@ -497,6 +559,19 @@ func (c *UserSvcHTTPClientImpl) SaveShare(ctx context.Context, in *SaveShareRequ
 	opts = append(opts, http.Operation(OperationUserSvcSaveShare))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *UserSvcHTTPClientImpl) SearchResource(ctx context.Context, in *SearchRequest, opts ...http.CallOption) (*CommonReply, error) {
+	var out CommonReply
+	pattern := "/search"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserSvcSearchResource))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

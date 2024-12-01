@@ -111,17 +111,19 @@ var Greeter_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	UserSvc_Register_FullMethodName    = "/user.v1.UserSvc/Register"
-	UserSvc_Login_FullMethodName       = "/user.v1.UserSvc/Login"
-	UserSvc_Upload_FullMethodName      = "/user.v1.UserSvc/Upload"
-	UserSvc_UploadOver_FullMethodName  = "/user.v1.UserSvc/UploadOver"
-	UserSvc_Download_FullMethodName    = "/user.v1.UserSvc/Download"
-	UserSvc_ListFiles_FullMethodName   = "/user.v1.UserSvc/ListFiles"
-	UserSvc_DeleteFiles_FullMethodName = "/user.v1.UserSvc/DeleteFiles"
-	UserSvc_CreateDir_FullMethodName   = "/user.v1.UserSvc/CreateDir"
-	UserSvc_CreateShare_FullMethodName = "/user.v1.UserSvc/CreateShare"
-	UserSvc_GetShare_FullMethodName    = "/user.v1.UserSvc/GetShare"
-	UserSvc_SaveShare_FullMethodName   = "/user.v1.UserSvc/SaveShare"
+	UserSvc_Register_FullMethodName       = "/user.v1.UserSvc/Register"
+	UserSvc_Login_FullMethodName          = "/user.v1.UserSvc/Login"
+	UserSvc_Upload_FullMethodName         = "/user.v1.UserSvc/Upload"
+	UserSvc_UploadOver_FullMethodName     = "/user.v1.UserSvc/UploadOver"
+	UserSvc_Download_FullMethodName       = "/user.v1.UserSvc/Download"
+	UserSvc_ListFiles_FullMethodName      = "/user.v1.UserSvc/ListFiles"
+	UserSvc_DeleteFiles_FullMethodName    = "/user.v1.UserSvc/DeleteFiles"
+	UserSvc_CreateDir_FullMethodName      = "/user.v1.UserSvc/CreateDir"
+	UserSvc_MoveFiles_FullMethodName      = "/user.v1.UserSvc/MoveFiles"
+	UserSvc_SearchResource_FullMethodName = "/user.v1.UserSvc/SearchResource"
+	UserSvc_CreateShare_FullMethodName    = "/user.v1.UserSvc/CreateShare"
+	UserSvc_GetShare_FullMethodName       = "/user.v1.UserSvc/GetShare"
+	UserSvc_SaveShare_FullMethodName      = "/user.v1.UserSvc/SaveShare"
 )
 
 // UserSvcClient is the client API for UserSvc service.
@@ -142,6 +144,8 @@ type UserSvcClient interface {
 	ListFiles(ctx context.Context, in *ListFilesRequest, opts ...grpc.CallOption) (*ListFilesReply, error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	MoveFiles(ctx context.Context, in *MoveFilesRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	SearchResource(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	CreateShare(ctx context.Context, in *CreateShareRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	GetShare(ctx context.Context, in *GetShareRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	SaveShare(ctx context.Context, in *SaveShareRequest, opts ...grpc.CallOption) (*CommonReply, error)
@@ -227,6 +231,24 @@ func (c *userSvcClient) CreateDir(ctx context.Context, in *CreateDirRequest, opt
 	return out, nil
 }
 
+func (c *userSvcClient) MoveFiles(ctx context.Context, in *MoveFilesRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, UserSvc_MoveFiles_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userSvcClient) SearchResource(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, UserSvc_SearchResource_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userSvcClient) CreateShare(ctx context.Context, in *CreateShareRequest, opts ...grpc.CallOption) (*CommonReply, error) {
 	out := new(CommonReply)
 	err := c.cc.Invoke(ctx, UserSvc_CreateShare_FullMethodName, in, out, opts...)
@@ -272,6 +294,8 @@ type UserSvcServer interface {
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*CommonReply, error)
 	CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error)
+	MoveFiles(context.Context, *MoveFilesRequest) (*CommonReply, error)
+	SearchResource(context.Context, *SearchRequest) (*CommonReply, error)
 	CreateShare(context.Context, *CreateShareRequest) (*CommonReply, error)
 	GetShare(context.Context, *GetShareRequest) (*CommonReply, error)
 	SaveShare(context.Context, *SaveShareRequest) (*CommonReply, error)
@@ -305,6 +329,12 @@ func (UnimplementedUserSvcServer) DeleteFiles(context.Context, *DeleteFilesReque
 }
 func (UnimplementedUserSvcServer) CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateDir not implemented")
+}
+func (UnimplementedUserSvcServer) MoveFiles(context.Context, *MoveFilesRequest) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MoveFiles not implemented")
+}
+func (UnimplementedUserSvcServer) SearchResource(context.Context, *SearchRequest) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchResource not implemented")
 }
 func (UnimplementedUserSvcServer) CreateShare(context.Context, *CreateShareRequest) (*CommonReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateShare not implemented")
@@ -472,6 +502,42 @@ func _UserSvc_CreateDir_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserSvc_MoveFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MoveFilesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSvcServer).MoveFiles(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSvc_MoveFiles_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSvcServer).MoveFiles(ctx, req.(*MoveFilesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserSvc_SearchResource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSvcServer).SearchResource(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSvc_SearchResource_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSvcServer).SearchResource(ctx, req.(*SearchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserSvc_CreateShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateShareRequest)
 	if err := dec(in); err != nil {
@@ -564,6 +630,14 @@ var UserSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateDir",
 			Handler:    _UserSvc_CreateDir_Handler,
+		},
+		{
+			MethodName: "MoveFiles",
+			Handler:    _UserSvc_MoveFiles_Handler,
+		},
+		{
+			MethodName: "SearchResource",
+			Handler:    _UserSvc_SearchResource_Handler,
 		},
 		{
 			MethodName: "CreateShare",

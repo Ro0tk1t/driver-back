@@ -72,6 +72,17 @@ service UserSvc {
       body: "*"
     };
   }
+  rpc MoveFiles(MoveFilesRequest) returns (CommonReply){
+    option (google.api.http) = {
+      post: "/moveFiles"
+      body: "*"
+    };
+  }
+  rpc SearchResource(SearchRequest) returns (CommonReply){
+    option (google.api.http) = {
+      get: "/search"
+    };
+  }
   rpc CreateShare(CreateShareRequest) returns (CommonReply){
     option (google.api.http) = {
       post: "/createShare"
@@ -162,9 +173,21 @@ message CreateDirRequest{
   string current = 2;
 }
 
+message MoveFilesRequest{
+  string path = 1;
+  repeated string names = 2;
+  string destination = 3;
+}
+
+message SearchRequest{
+  string keyword = 1;
+  uint32 page = 2;
+  uint32 pageSize = 3;
+}
+
 message CreateShareRequest{
   string path = 1;
-  string names = 2;
+  repeated string names = 2;
   string expireTime = 3;
   string password = 4;
 }
@@ -176,7 +199,7 @@ message GetShareRequest{
 
 message SaveShareRequest{
   string sharePath = 1;
-  string names = 2;
+  repeated string names = 2;
   string shareID = 3;
   string savePath = 4;
 }

@@ -169,6 +169,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.v1.CommonReply'
+    /moveFiles:
+        post:
+            tags:
+                - UserSvc
+            operationId: UserSvc_MoveFiles
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/user.v1.MoveFilesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.CommonReply'
     /register:
         post:
             tags:
@@ -198,6 +216,33 @@ paths:
                         schema:
                             $ref: '#/components/schemas/user.v1.SaveShareRequest'
                 required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.CommonReply'
+    /search:
+        get:
+            tags:
+                - UserSvc
+            operationId: UserSvc_SearchResource
+            parameters:
+                - name: keyword
+                  in: query
+                  schema:
+                    type: string
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
             responses:
                 "200":
                     description: OK
@@ -272,7 +317,9 @@ components:
                 path:
                     type: string
                 names:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 expireTime:
                     type: string
                 password:
@@ -325,6 +372,17 @@ components:
                     type: string
                 password:
                     type: string
+        user.v1.MoveFilesRequest:
+            type: object
+            properties:
+                path:
+                    type: string
+                names:
+                    type: array
+                    items:
+                        type: string
+                destination:
+                    type: string
         user.v1.RegisterRequest:
             type: object
             properties:
@@ -342,7 +400,9 @@ components:
                 sharePath:
                     type: string
                 names:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 shareID:
                     type: string
                 savePath:

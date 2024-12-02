@@ -4,6 +4,7 @@ import (
 	"context"
 	"driver-back/public"
 	"fmt"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-playground/validator/v10"
@@ -18,6 +19,8 @@ type UserRepo interface {
 	ListFiles(ctx context.Context, uid int64, path string, page, pageSize uint32) (int64, []public.File, error)
 	GetFile(ctx context.Context, uid int64, path, filename string) ([]byte, error)
 	DeleteFiles(ctx context.Context, uid int64, path string, files []string)
+	GetFid(ctx context.Context, uid int64, path_ string, name string) (int64, error)
+	CreateShareRecode(ctx context.Context, now time.Time, user *public.User, fids []int64, pwd, exp string) (string, error)
 }
 
 type UserUseCase struct {
@@ -86,4 +89,16 @@ func (u *UserUseCase) DeleteFiles(ctx context.Context, uid int64, path string, f
 	// }
 	u.repo.DeleteFiles(ctx, uid, path, files)
 	//return u.repo.DeleteFiles(ctx, uid, path, files)
+}
+
+func (u *UserUseCase) CreateShare(ctx context.Context, user *public.User, names []string, dir, pwd, exp string) (string, error) {
+	now := time.Now()
+	//TODO: if time.Now() > exp
+	var fids []int64
+	for _, name := range names {
+		if id, err := u.repo.GetFid(ctx, user.ID, dir, name); err == nil {
+			fids = append(fids, id)
+		}
+	}
+	return u.repo.CreateShareRecode(ctx, now, user, fids, pwd, exp)
 }

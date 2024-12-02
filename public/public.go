@@ -4,7 +4,10 @@ import "os"
 
 const TmpDir = "/tmp/driver-back"
 
-var StoreType = "minio"
+var (
+	StoreType = "minio"
+	OutterURL = "http://127.0.0.1:5173"
+)
 
 func init() {
 	if _, err := os.Stat(TmpDir); err != nil {

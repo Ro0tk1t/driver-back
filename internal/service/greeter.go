@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"strings"
@@ -61,7 +62,7 @@ func (u *UserService) Register(ctx context.Context, reg *v1.RegisterRequest) (*v
 	if err != nil {
 		return nil, err
 	}
-	return &v1.CommonReply{Code: 200, Message: user.Name}, nil
+	return &v1.CommonReply{Code: http.StatusOK, Message: user.Name}, nil
 }
 
 func getUserFromCtx(ctx context.Context) *public.User {
@@ -121,7 +122,7 @@ func (u *UserService) Login(ctx context.Context, req *v1.LoginRequest) (*v1.Comm
 	}
 	msg, _ := json.Marshal(msgMap)
 
-	return &v1.CommonReply{Code: 200, Message: string(msg)}, nil
+	return &v1.CommonReply{Code: http.StatusOK, Message: string(msg)}, nil
 }
 func (u *UserService) Upload(ctx context.Context, req *v1.UploadRequest) (*v1.CommonReply, error) {
 	fn := fmt.Sprintf("%s.part.%d", req.Filename, req.ChunkIndex)
@@ -132,7 +133,7 @@ func (u *UserService) Upload(ctx context.Context, req *v1.UploadRequest) (*v1.Co
 			return nil, err
 		}
 	}
-	return &v1.CommonReply{Code: 200, Message: fn}, nil
+	return &v1.CommonReply{Code: http.StatusOK, Message: fn}, nil
 }
 
 func (u *UserService) UploadOver(ctx context.Context, req *v1.UploadRequest) (*v1.CommonReply, error) {
@@ -169,7 +170,7 @@ func (u *UserService) UploadOver(ctx context.Context, req *v1.UploadRequest) (*v
 		Size: int64(size),
 		Time: time.Now().Unix(),
 	})
-	return &v1.CommonReply{Code: 200, Message: "seccess"}, nil
+	return &v1.CommonReply{Code: http.StatusOK, Message: "seccess"}, nil
 }
 
 func (u *UserService) Download(ctx context.Context, req *v1.DownloadRequest) (*v1.DownloadReply, error) {
@@ -223,11 +224,16 @@ func (u *UserService) CreateDir(ctx context.Context, req *v1.CreateDirRequest) (
 		Size: 0,
 		Time: time.Now().Unix(),
 	})
-	return &v1.CommonReply{Code: 200, Message: "seccess"}, nil
+	return &v1.CommonReply{Code: http.StatusOK, Message: "seccess"}, nil
 }
 
 func (u *UserService) CreateShare(ctx context.Context, req *v1.CreateShareRequest) (*v1.CommonReply, error) {
-	return nil, nil
+	user := getUserFromCtx(ctx)
+	url, err := u.uu.CreateShare(ctx, user, req.Names, req.Path, req.Password, req.ExpireTime)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.CommonReply{Message: url, Code: http.StatusOK}, nil
 }
 
 func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v1.CommonReply, error) {

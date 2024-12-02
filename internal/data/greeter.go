@@ -2,9 +2,12 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"path"
+	"time"
 
 	"driver-back/internal/biz"
 	"driver-back/public"
@@ -13,6 +16,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sony/sonyflake"
 	"xorm.io/xorm"
 )
 
@@ -253,5 +257,46 @@ func (u *userRepo) DeleteFiles(ctx context.Context, uid int64, path_ string, fil
 		if _, err := u.engine.Where("uid=?", uid).And("path=?", path_).And("name=?", f).Delete(&public.File{}); err != nil {
 			u.log.Error(err)
 		}
+	}
+}
+
+func (u *userRepo) GetFid(ctx context.Context, uid int64, path_ string, name string) (int64, error) {
+	file := public.File{}
+	has, err := u.engine.Where("uid=?", uid).And("path=?", path_).And("name=?", name).Get(&file)
+	if !has {
+		return 0, fmt.Errorf("file not exists: %s", name)
+	}
+	if err != nil {
+		return 0, err
+	}
+	return file.ID, nil
+}
+
+func (u *userRepo) CreateShareRecode(ctx context.Context, now time.Time, user *public.User, fids []int64, pwd, exp string) (string, error) {
+	url_, err := url.Parse(public.OutterURL)
+	if err != nil {
+		u.log.Error(err)
+		return "", err
+	}
+	var st sonyflake.Settings
+	sf, err := sonyflake.New(st)
+	if err != nil {
+		return "", err
+	}
+	if id, err := sf.NextID(); err != nil {
+		return "", err
+	} else {
+		url_ = url_.JoinPath(fmt.Sprintf("/share/%d", id))
+		js, _ := json.Marshal(fids)
+		share := public.ShareInfo{
+			Link: url_.String(), UserName: user.Name,
+			Uid: user.ID, Fids: string(js), Created: now.Unix(),
+		}
+		_, err := u.engine.Insert(share)
+		if err != nil {
+			u.log.Error(err)
+			return "", err
+		}
+		return url_.String(), nil
 	}
 }

@@ -33,10 +33,12 @@ type File struct {
 }
 
 type ShareInfo struct {
+	ID       string `json:"id" xorm:"'id' varchar(255) not null"`
 	Link     string `json:"link" xorm:"'link' varchar(255)"`
 	UserName string `json:"username" xorm:"'username' varchar(255)"`
 	Fids     string `json:"fid" xorm:"'fids' text"`
 	Uid      int64  `json:"uid" xorm:"'uid' int"`
+	Password string `json:"password" xorm:"'password' varchar(255) default('')"`
 	Created  int64  `json:"created" xorm:"'created' int"`
 	Expired  int64  `json:"expired" xorm:"'expired' int"`
 }

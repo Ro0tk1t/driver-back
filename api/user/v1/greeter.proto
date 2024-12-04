@@ -202,4 +202,5 @@ message SaveShareRequest{
   repeated string names = 2;
   string shareID = 3;
   string savePath = 4;
+  string password = 5;
 }

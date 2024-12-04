@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strconv"
 	"time"
 
 	"driver-back/internal/biz"
@@ -289,6 +290,7 @@ func (u *userRepo) CreateShareRecode(ctx context.Context, now time.Time, user *p
 		url_ = url_.JoinPath(fmt.Sprintf("/share/%d", id))
 		js, _ := json.Marshal(fids)
 		share := public.ShareInfo{
+			ID:   strconv.FormatUint(id, 10),
 			Link: url_.String(), UserName: user.Name,
 			Uid: user.ID, Fids: string(js), Created: now.Unix(),
 		}
@@ -299,4 +301,21 @@ func (u *userRepo) CreateShareRecode(ctx context.Context, now time.Time, user *p
 		}
 		return url_.String(), nil
 	}
+}
+
+func (u *userRepo) GetShares(ctx context.Context, id, pwd string) (string, []public.File, error) {
+	shareInfo := public.ShareInfo{}
+	u.engine.Where("id=?", id).Get(&shareInfo)
+	if pwd != shareInfo.Password {
+		return "", nil, fmt.Errorf("password of share incourrect")
+	}
+	var fids []int64
+	json.Unmarshal([]byte(shareInfo.Fids), &fids)
+	var finfos []public.File
+	for _, fid := range fids {
+		var finfo public.File
+		u.engine.Where("id=?", fid).Get(&finfo)
+		finfos = append(finfos, finfo)
+	}
+	return shareInfo.UserName, finfos, nil
 }

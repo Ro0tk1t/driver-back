@@ -21,6 +21,7 @@ type UserRepo interface {
 	DeleteFiles(ctx context.Context, uid int64, path string, files []string)
 	GetFid(ctx context.Context, uid int64, path_ string, name string) (int64, error)
 	CreateShareRecode(ctx context.Context, now time.Time, user *public.User, fids []int64, pwd, exp string) (string, error)
+	GetShares(ctx context.Context, id, pwd string) (string, []public.File, error)
 }
 
 type UserUseCase struct {
@@ -101,4 +102,8 @@ func (u *UserUseCase) CreateShare(ctx context.Context, user *public.User, names 
 		}
 	}
 	return u.repo.CreateShareRecode(ctx, now, user, fids, pwd, exp)
+}
+
+func (u *UserUseCase) GetShare(ctx context.Context, sid, pwd string) (string, []public.File, error) {
+	return u.repo.GetShares(ctx, sid, pwd)
 }

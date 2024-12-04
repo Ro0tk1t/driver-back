@@ -237,7 +237,21 @@ func (u *UserService) CreateShare(ctx context.Context, req *v1.CreateShareReques
 }
 
 func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v1.CommonReply, error) {
-	return nil, nil
+	username, infos, err := u.uu.GetShare(ctx, req.Id, req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	data := struct {
+		Username  string
+		ShareList []public.File
+	}{
+		Username:  username,
+		ShareList: infos,
+	}
+
+	js, _ := json.Marshal(data)
+	return &v1.CommonReply{Message: string(js), Code: http.StatusOK}, nil
 }
 
 func (u *UserService) SaveShare(ctx context.Context, req *v1.SaveShareRequest) (*v1.CommonReply, error) {

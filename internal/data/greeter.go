@@ -293,6 +293,7 @@ func (u *userRepo) CreateShareRecode(ctx context.Context, now time.Time, user *p
 			ID:   strconv.FormatUint(id, 10),
 			Link: url_.String(), UserName: user.Name,
 			Uid: user.ID, Fids: string(js), Created: now.Unix(),
+			Password: pwd,
 		}
 		_, err := u.engine.Insert(share)
 		if err != nil {
@@ -307,7 +308,7 @@ func (u *userRepo) GetShares(ctx context.Context, id, pwd string) (string, []pub
 	shareInfo := public.ShareInfo{}
 	u.engine.Where("id=?", id).Get(&shareInfo)
 	if pwd != shareInfo.Password {
-		return "", nil, fmt.Errorf("password of share incourrect")
+		return "", nil, fmt.Errorf("password incourrect")
 	}
 	var fids []int64
 	json.Unmarshal([]byte(shareInfo.Fids), &fids)

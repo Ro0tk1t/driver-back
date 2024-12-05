@@ -241,6 +241,9 @@ func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v
 	if err != nil {
 		return nil, err
 	}
+	if username == "" || len(infos) <= 0 {
+		return &v1.CommonReply{Message: "{}", Code: http.StatusNotFound}, nil
+	}
 
 	data := struct {
 		Username  string

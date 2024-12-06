@@ -257,6 +257,8 @@ func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v
 	return &v1.CommonReply{Message: string(js), Code: http.StatusOK}, nil
 }
 
+func (u *UserService) DownloadShare() {}
+
 func (u *UserService) SaveShare(ctx context.Context, req *v1.SaveShareRequest) (*v1.CommonReply, error) {
 	return nil, nil
 }

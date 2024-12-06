@@ -49,11 +49,15 @@ service UserSvc {
       body: "*"
     };
   }
-  //rpc Download(DownloadRequest) returns (stream DownloadReply) {
   rpc Download(DownloadRequest) returns (DownloadReply) {
     option (google.api.http) = {
       get: "/download/{filename}"
     };
+  }
+  rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+    option (google.api.http) = {
+      get: "/download/share/{id}"
+    }
   }
   rpc ListFiles(ListFilesRequest) returns (ListFilesReply) {
     option (google.api.http) = {

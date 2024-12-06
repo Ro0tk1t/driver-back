@@ -182,6 +182,9 @@ func (u *userRepo) GetFile(ctx context.Context, uid int64, path_, filename strin
 	if err != nil || !has {
 		return nil, err
 	}
+	return u.GetFileByHash(ctx, hash)
+}
+func (u *userRepo) GetFileByHash(ctx context.Context, hash string) ([]byte, error) {
 	p := fmt.Sprintf("%s/%s/%s", public.TmpDir, hash[:2], hash[2:])
 	if _, err := os.Stat(p); !os.IsNotExist(err) {
 		b, _ := os.ReadFile(p)
@@ -319,4 +322,19 @@ func (u *userRepo) GetShares(ctx context.Context, id, pwd string) (string, []pub
 		finfos = append(finfos, finfo)
 	}
 	return shareInfo.UserName, finfos, nil
+}
+
+func (u *userRepo) GetShareFile(ctx context.Context, id, fid, hash, filename string) ([]byte, error) {
+	// TODO: validate
+
+	// shareInfo := struct {
+	// 	public.ShareInfo `xorm:"extends"`
+	// 	public.File      `xorm:"extends"`
+	// }{}
+	// has, err := u.engine.Table(&public.File{}).Select("share_info.*, file.*").Join("INNER", "share_info", "share_info.").
+	// Where("uid=?", uid).And("path=?", path_).And("name=?", filename).Get(&hash)
+	// if err != nil || !has {
+	// 	return nil, err
+	// }
+	return u.GetFileByHash(ctx, hash)
 }

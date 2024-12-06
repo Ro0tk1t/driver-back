@@ -49,10 +49,16 @@ service UserSvc {
       body: "*"
     };
   }
-  //rpc Download(DownloadRequest) returns (stream DownloadReply) {
   rpc Download(DownloadRequest) returns (DownloadReply) {
     option (google.api.http) = {
       get: "/download/{filename}"
+    };
+  }
+  // kratos not support stream yet
+  //rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+  rpc DownloadShare(DownloadShareRequest) returns (DownloadReply) {
+    option (google.api.http) = {
+      get: "/download/share/{id}"
     };
   }
   rpc ListFiles(ListFilesRequest) returns (ListFilesReply) {
@@ -203,4 +209,15 @@ message SaveShareRequest{
   string shareID = 3;
   string savePath = 4;
   string password = 5;
+}
+
+message DownloadShareRequest{
+  string id = 1;
+  string fid = 2;
+  string filename = 3;
+  string hash = 4;
+}
+
+message Test{
+  bytes content = 1;
 }

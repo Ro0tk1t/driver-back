@@ -257,6 +257,18 @@ func (u *UserService) GetShare(ctx context.Context, req *v1.GetShareRequest) (*v
 	return &v1.CommonReply{Message: string(js), Code: http.StatusOK}, nil
 }
 
+// func (u *UserService) DownloadShare(req *v1.DownloadShareRequest, req1 v1.UserSvc_DownloadShareServer) error {
+func (u *UserService) DownloadShare(ctx context.Context, req *v1.DownloadShareRequest) (*v1.DownloadReply, error) {
+	fmt.Printf("%#v\n", req)
+	// TODO: directory support ?
+	content, err := u.uu.DownloadShare(ctx, req.Id, req.Fid, req.Hash, req.Filename)
+	if err != nil {
+		return nil, nil
+	}
+	// fmt.Println(string(content))
+	return &v1.DownloadReply{Content: content}, nil
+}
+
 func (u *UserService) SaveShare(ctx context.Context, req *v1.SaveShareRequest) (*v1.CommonReply, error) {
 	return nil, nil
 }

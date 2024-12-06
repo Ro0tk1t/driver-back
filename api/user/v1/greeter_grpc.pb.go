@@ -116,6 +116,7 @@ const (
 	UserSvc_Upload_FullMethodName         = "/user.v1.UserSvc/Upload"
 	UserSvc_UploadOver_FullMethodName     = "/user.v1.UserSvc/UploadOver"
 	UserSvc_Download_FullMethodName       = "/user.v1.UserSvc/Download"
+	UserSvc_DownloadShare_FullMethodName  = "/user.v1.UserSvc/DownloadShare"
 	UserSvc_ListFiles_FullMethodName      = "/user.v1.UserSvc/ListFiles"
 	UserSvc_DeleteFiles_FullMethodName    = "/user.v1.UserSvc/DeleteFiles"
 	UserSvc_CreateDir_FullMethodName      = "/user.v1.UserSvc/CreateDir"
@@ -139,8 +140,10 @@ type UserSvcClient interface {
 	//	}
 	Upload(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	UploadOver(ctx context.Context, in *UploadRequest, opts ...grpc.CallOption) (*CommonReply, error)
-	// rpc Download(DownloadRequest) returns (stream DownloadReply) {
 	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (*DownloadReply, error)
+	// kratos not support stream yet
+	// rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+	DownloadShare(ctx context.Context, in *DownloadShareRequest, opts ...grpc.CallOption) (*DownloadReply, error)
 	ListFiles(ctx context.Context, in *ListFilesRequest, opts ...grpc.CallOption) (*ListFilesReply, error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*CommonReply, error)
 	CreateDir(ctx context.Context, in *CreateDirRequest, opts ...grpc.CallOption) (*CommonReply, error)
@@ -198,6 +201,15 @@ func (c *userSvcClient) UploadOver(ctx context.Context, in *UploadRequest, opts 
 func (c *userSvcClient) Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (*DownloadReply, error) {
 	out := new(DownloadReply)
 	err := c.cc.Invoke(ctx, UserSvc_Download_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userSvcClient) DownloadShare(ctx context.Context, in *DownloadShareRequest, opts ...grpc.CallOption) (*DownloadReply, error) {
+	out := new(DownloadReply)
+	err := c.cc.Invoke(ctx, UserSvc_DownloadShare_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -289,8 +301,10 @@ type UserSvcServer interface {
 	//	}
 	Upload(context.Context, *UploadRequest) (*CommonReply, error)
 	UploadOver(context.Context, *UploadRequest) (*CommonReply, error)
-	// rpc Download(DownloadRequest) returns (stream DownloadReply) {
 	Download(context.Context, *DownloadRequest) (*DownloadReply, error)
+	// kratos not support stream yet
+	// rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+	DownloadShare(context.Context, *DownloadShareRequest) (*DownloadReply, error)
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*CommonReply, error)
 	CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error)
@@ -320,6 +334,9 @@ func (UnimplementedUserSvcServer) UploadOver(context.Context, *UploadRequest) (*
 }
 func (UnimplementedUserSvcServer) Download(context.Context, *DownloadRequest) (*DownloadReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Download not implemented")
+}
+func (UnimplementedUserSvcServer) DownloadShare(context.Context, *DownloadShareRequest) (*DownloadReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DownloadShare not implemented")
 }
 func (UnimplementedUserSvcServer) ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListFiles not implemented")
@@ -444,6 +461,24 @@ func _UserSvc_Download_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserSvcServer).Download(ctx, req.(*DownloadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserSvc_DownloadShare_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DownloadShareRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSvcServer).DownloadShare(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserSvc_DownloadShare_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSvcServer).DownloadShare(ctx, req.(*DownloadShareRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -618,6 +653,10 @@ var UserSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Download",
 			Handler:    _UserSvc_Download_Handler,
+		},
+		{
+			MethodName: "DownloadShare",
+			Handler:    _UserSvc_DownloadShare_Handler,
 		},
 		{
 			MethodName: "ListFiles",

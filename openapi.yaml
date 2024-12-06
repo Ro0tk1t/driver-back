@@ -60,11 +60,43 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/user.v1.CommonReply'
+    /download/share/{id}:
+        get:
+            tags:
+                - UserSvc
+            description: |-
+                kratos not support stream yet
+                rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+            operationId: UserSvc_DownloadShare
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: fid
+                  in: query
+                  schema:
+                    type: string
+                - name: filename
+                  in: query
+                  schema:
+                    type: string
+                - name: hash
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/user.v1.DownloadReply'
     /download/{filename}:
         get:
             tags:
                 - UserSvc
-            description: rpc Download(DownloadRequest) returns (stream DownloadReply) {
             operationId: UserSvc_Download
             parameters:
                 - name: filename
@@ -406,6 +438,8 @@ components:
                 shareID:
                     type: string
                 savePath:
+                    type: string
+                password:
                     type: string
         user.v1.UploadRequest:
             type: object

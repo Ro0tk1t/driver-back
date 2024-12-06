@@ -82,6 +82,7 @@ const OperationUserSvcCreateDir = "/user.v1.UserSvc/CreateDir"
 const OperationUserSvcCreateShare = "/user.v1.UserSvc/CreateShare"
 const OperationUserSvcDeleteFiles = "/user.v1.UserSvc/DeleteFiles"
 const OperationUserSvcDownload = "/user.v1.UserSvc/Download"
+const OperationUserSvcDownloadShare = "/user.v1.UserSvc/DownloadShare"
 const OperationUserSvcGetShare = "/user.v1.UserSvc/GetShare"
 const OperationUserSvcListFiles = "/user.v1.UserSvc/ListFiles"
 const OperationUserSvcLogin = "/user.v1.UserSvc/Login"
@@ -96,8 +97,10 @@ type UserSvcHTTPServer interface {
 	CreateDir(context.Context, *CreateDirRequest) (*CommonReply, error)
 	CreateShare(context.Context, *CreateShareRequest) (*CommonReply, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*CommonReply, error)
-	// Downloadrpc Download(DownloadRequest) returns (stream DownloadReply) {
 	Download(context.Context, *DownloadRequest) (*DownloadReply, error)
+	// DownloadShare kratos not support stream yet
+	//rpc DownloadShare(DownloadShareRequest) returns (stream DownloadReply) {
+	DownloadShare(context.Context, *DownloadShareRequest) (*DownloadReply, error)
 	GetShare(context.Context, *GetShareRequest) (*CommonReply, error)
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesReply, error)
 	Login(context.Context, *LoginRequest) (*CommonReply, error)
@@ -121,6 +124,7 @@ func RegisterUserSvcHTTPServer(s *http.Server, srv UserSvcHTTPServer) {
 	r.POST("/upload", _UserSvc_Upload0_HTTP_Handler(srv))
 	r.POST("/uploadOver", _UserSvc_UploadOver0_HTTP_Handler(srv))
 	r.GET("/download/{filename}", _UserSvc_Download0_HTTP_Handler(srv))
+	r.GET("/download/share/{id}", _UserSvc_DownloadShare0_HTTP_Handler(srv))
 	r.GET("/listFiles", _UserSvc_ListFiles0_HTTP_Handler(srv))
 	r.POST("/deleteFiles", _UserSvc_DeleteFiles0_HTTP_Handler(srv))
 	r.POST("/createDir", _UserSvc_CreateDir0_HTTP_Handler(srv))
@@ -231,6 +235,28 @@ func _UserSvc_Download0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Contex
 		http.SetOperation(ctx, OperationUserSvcDownload)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Download(ctx, req.(*DownloadRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DownloadReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _UserSvc_DownloadShare0_HTTP_Handler(srv UserSvcHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DownloadShareRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserSvcDownloadShare)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DownloadShare(ctx, req.(*DownloadShareRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -416,6 +442,7 @@ type UserSvcHTTPClient interface {
 	CreateShare(ctx context.Context, req *CreateShareRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	DeleteFiles(ctx context.Context, req *DeleteFilesRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	Download(ctx context.Context, req *DownloadRequest, opts ...http.CallOption) (rsp *DownloadReply, err error)
+	DownloadShare(ctx context.Context, req *DownloadShareRequest, opts ...http.CallOption) (rsp *DownloadReply, err error)
 	GetShare(ctx context.Context, req *GetShareRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	ListFiles(ctx context.Context, req *ListFilesRequest, opts ...http.CallOption) (rsp *ListFilesReply, err error)
 	Login(ctx context.Context, req *LoginRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
@@ -479,6 +506,19 @@ func (c *UserSvcHTTPClientImpl) Download(ctx context.Context, in *DownloadReques
 	pattern := "/download/{filename}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserSvcDownload))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *UserSvcHTTPClientImpl) DownloadShare(ctx context.Context, in *DownloadShareRequest, opts ...http.CallOption) (*DownloadReply, error) {
+	var out DownloadReply
+	pattern := "/download/share/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserSvcDownloadShare))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

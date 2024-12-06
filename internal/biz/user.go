@@ -18,10 +18,12 @@ type UserRepo interface {
 	CreateFileLocal(ctx context.Context, path_ string, file *public.File) error
 	ListFiles(ctx context.Context, uid int64, path string, page, pageSize uint32) (int64, []public.File, error)
 	GetFile(ctx context.Context, uid int64, path, filename string) ([]byte, error)
+	GetFileByHash(ctx context.Context, hash string) ([]byte, error)
 	DeleteFiles(ctx context.Context, uid int64, path string, files []string)
 	GetFid(ctx context.Context, uid int64, path_ string, name string) (int64, error)
 	CreateShareRecode(ctx context.Context, now time.Time, user *public.User, fids []int64, pwd, exp string) (string, error)
 	GetShares(ctx context.Context, id, pwd string) (string, []public.File, error)
+	GetShareFile(ctx context.Context, id, fid, hash, filename string) ([]byte, error)
 }
 
 type UserUseCase struct {
@@ -106,4 +108,8 @@ func (u *UserUseCase) CreateShare(ctx context.Context, user *public.User, names 
 
 func (u *UserUseCase) GetShare(ctx context.Context, sid, pwd string) (string, []public.File, error) {
 	return u.repo.GetShares(ctx, sid, pwd)
+}
+
+func (u *UserUseCase) DownloadShare(ctx context.Context, id, fid, hash, filename string) ([]byte, error) {
+	return u.repo.GetShareFile(ctx, id, fid, hash, filename)
 }

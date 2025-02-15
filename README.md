@@ -1,11 +1,21 @@
 # Kratos Project
 
-### Kratos + MariaDB + Minio 
+### Kratos + MariaDB + Minio + Snowflake
 
 ## Install Kratos
 ```
 go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
 ```
+
+## start project
+1. install MariaDB and Minio (not required)
+2. create database: `zdriver`
+3. update configs/conf.yaml
+4. start project
+    ```
+    kratos run
+    ```
+
 ## Create a service
 ```
 # Create a template project

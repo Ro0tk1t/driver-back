@@ -16,7 +16,9 @@ go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
     kratos run
     ```
 
-## Create a service
+## Development
+
+### Create a service
 ```
 # Create a template project
 kratos new server
@@ -33,7 +35,7 @@ go generate ./...
 go build -o ./bin/ ./...
 ./bin/server -conf ./configs
 ```
-## Generate other auxiliary files by Makefile
+### Generate other auxiliary files by Makefile
 ```
 # Download and update dependencies
 make init
@@ -42,7 +44,7 @@ make api
 # Generate all files
 make all
 ```
-## Automated Initialization (wire)
+### Automated Initialization (wire)
 ```
 # install wire
 go get github.com/google/wire/cmd/wire
@@ -52,7 +54,7 @@ cd cmd/server
 wire
 ```
 
-## Docker
+### Docker
 ```bash
 # build
 docker build -t <your-docker-image-name> .

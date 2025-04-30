@@ -1,11 +1,11 @@
 module driver-back
 
-go 1.22
+go 1.24
 
-toolchain go1.23.3
+toolchain 1.24.2
 
 require (
-	github.com/go-kratos/kratos/v2 v2.8.0
+	github.com/go-kratos/kratos/v2 v2.8.4
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
